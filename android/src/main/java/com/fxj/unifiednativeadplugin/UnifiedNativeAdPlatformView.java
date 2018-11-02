@@ -11,6 +11,9 @@ import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -27,7 +30,7 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
     private AdLoader mAdLoader;
     private UnifiedNativeAd mNativeAd;
     private AdStatus mAdStatus;
-    private int mViewId;
+    protected int mViewId;
     private UnifiedNativeAdView mAdView;
 
     public UnifiedNativeAdPlatformView(Context context, BinaryMessenger messenger, int
@@ -88,64 +91,47 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
                                 @Override
                                 public void onUnifiedNativeAdLoaded(UnifiedNativeAd
                                                                             unifiedNativeAd) {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onUnifiedNativeAdLoaded, id: " + mViewId);
-                                    }
-                                    if(mChannel == null){
-                                        Log.w(TAG, "adview disposed, so skip show ad.");
+                                    if (!onAdEvent("onUnifiedNativeAdLoaded")) {
+                                        Log.w(TAG, "adview disposed, so skip show ad. id: " +
+                                                mViewId);
                                         return;
                                     }
                                     mNativeAd = unifiedNativeAd;
-                                    mChannel.invokeMethod("onAdLoaded", null);
-                                    if (mAdStatus == AdStatus.PENDING) {
-
-                                    }
                                     populateAd(mNativeAd, mAdView);
                                     mAdView.setNativeAd(mNativeAd);
                                 }
                             }).withAdListener(new AdListener() {
                                 @Override
                                 public void onAdLoaded() {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onAdLoaded, id: " + mViewId);
-                                    }
+                                    onAdEvent("onAdLoaded");
                                 }
 
                                 @Override
                                 public void onAdFailedToLoad(int errorCode) {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onAdFailedToLoad, id: " + mViewId);
-                                    }
+                                    HashMap<String, Object> parameters = new HashMap<>();
+                                    parameters.put("errorCode", errorCode);
+                                    onAdEvent("onAdFailedToLoad", parameters);
                                 }
 
                                 @Override
                                 public void onAdClicked() {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onAdClicked, id: " + mViewId);
-                                    }
+                                    onAdEvent("onAdClicked");
                                 }
 
                                 @Override
                                 public void onAdOpened() {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onAdOpened, id: " + mViewId);
-                                    }
+                                    onAdEvent("onAdOpened");
                                 }
 
                                 @Override
                                 public void onAdImpression() {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onAdImpression, id: " + mViewId);
-                                    }
+                                    onAdEvent("onAdImpression");
                                 }
 
                                 @Override
                                 public void onAdClosed() {
-                                    if (BuildConfig.DEBUG) {
-                                        Log.d(TAG, "onAdClosed, id: " + mViewId);
-                                    }
+                                    onAdEvent("onAdClosed");
                                 }
-
                             })
                             .withNativeAdOptions(new NativeAdOptions.Builder()
                                     // Methods in the NativeAdOptions.Builder class can be
@@ -170,6 +156,26 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
             default:
                 result.notImplemented();
         }
+    }
+
+    private boolean onAdEvent(String event) {
+        return onAdEvent(event, null);
+    }
+
+    private boolean onAdEvent(String event, HashMap<String, Object> parameters) {
+        if (mChannel != null) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("id", mViewId);
+            if (parameters != null) {
+                map.putAll(parameters);
+            }
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, event+", id: " + mViewId+", parameters: "+map);
+            }
+            mChannel.invokeMethod(event, map);
+            return true;
+        }
+        return false;
     }
 
     public abstract UnifiedNativeAdView createUnifiedNativeAdView(Context context, BinaryMessenger
