@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 const _kIsDebug = !bool.fromEnvironment("dart.vm.product");
 enum MobileAdEvent {
   loading,
+  onUnifiedNativeAdLoaded,
   loaded,
   failedToLoad,
   clicked,
@@ -18,6 +19,7 @@ class UnifiedNativeAdView extends StatefulWidget {
   static const TEST_AD_ID = "ca-app-pub-3940256099942544/2247696110";
   static const Map<String, MobileAdEvent> _methodToMobileAdEvent =
       <String, MobileAdEvent>{
+    'onUnifiedNativeAdLoaded': MobileAdEvent.onUnifiedNativeAdLoaded,
     'onAdLoaded': MobileAdEvent.loaded,
     'onAdFailedToLoad': MobileAdEvent.failedToLoad,
     'onAdClicked': MobileAdEvent.clicked,
@@ -78,11 +80,11 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
         height: 0.0,
       );
     }
-    bool shouldShowNow =  _created && _adEventOccur;
+    bool shouldShowNow = _created && _adEventOccur;
     debugPrint(
         'build platform view ... _created? $_created,  _isAdShowing=> $_isAdShowing');
     return Offstage(
-      offstage: !shouldShowNow,
+      offstage: !shouldShowNow && widget.placeHolder == null,
       child: Container(
           width: widget.width,
           height: widget.height,
@@ -93,6 +95,10 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
               AndroidView(
                 viewType: widget.viewType,
                 onPlatformViewCreated: _onPlatformViewCreated,
+              ),
+              Offstage(
+                offstage: shouldShowNow || widget.placeHolder == null,
+                child: widget.placeHolder,
               ),
               Offstage(
                   offstage: !widget.debugAd || _isAdShowing,
@@ -129,6 +135,9 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
       if (UnifiedNativeAdView._methodToMobileAdEvent[adEvent] ==
           MobileAdEvent.impression) {
         _isAdShowing = true;
+      } else if (UnifiedNativeAdView._methodToMobileAdEvent[adEvent] ==
+          MobileAdEvent.failedToLoad) {
+        adEvent = '$adEvent errorCode: ${call.arguments['errorCode']}';
       }
     });
   }

@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
-import 'package:unified_nativead_plugin/unified_nativead_plugin.dart';
 
 import 'package:unified_nativead_plugin/unified_nativead_view.dart';
 
@@ -28,15 +24,16 @@ class _MyAppState extends State<MyApp> {
         appBar: new AppBar(
           title: const Text('UnifiedNativeAd example app'),
         ),
-        body: new Column(
-          children:<Widget>[
-            new Text('Test Text'),
-            UnifiedNativeAdView(
+        body: new Center(
+          child: UnifiedNativeAdView(
               adUnitId: UnifiedNativeAdView.TEST_AD_ID,
               height: 350.0,
               viewType: "native1",
+              debugAd: true,
+              placeHolder: Container(
+                color: Colors.greenAccent,
+              ),
             )
-          ]
         ),
       ),
     );
