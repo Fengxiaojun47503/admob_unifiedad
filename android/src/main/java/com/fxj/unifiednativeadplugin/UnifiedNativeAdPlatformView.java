@@ -24,14 +24,14 @@ import static com.fxj.unifiednativeadplugin.UnifiedNativeadPlugin.PLUGIN_PREFIX;
 public abstract class UnifiedNativeAdPlatformView implements PlatformView, MethodChannel
         .MethodCallHandler {
     private static final String TAG = UnifiedNativeAdPlatformView.class.getSimpleName();
-    private Context mContext;
-    private String[] mTestDevices;
-    private MethodChannel mChannel;
-    private AdLoader mAdLoader;
-    private UnifiedNativeAd mNativeAd;
-    private AdStatus mAdStatus;
+    protected Context mContext;
+    protected String[] mTestDevices;
+    protected MethodChannel mChannel;
+    protected AdLoader mAdLoader;
+    protected UnifiedNativeAd mNativeAd;
+    protected AdStatus mAdStatus;
     protected int mViewId;
-    private UnifiedNativeAdView mAdView;
+    protected View mAdView;
 
     public UnifiedNativeAdPlatformView(Context context, BinaryMessenger messenger, int
             id, String viewType) {
@@ -42,7 +42,11 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "createView id: " + mViewId);
         }
-        mChannel = new MethodChannel(messenger, PLUGIN_PREFIX + "_" + viewType + "_" + id);
+        String channelName = PLUGIN_PREFIX + "_" + viewType + "_" + id;
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "register channel =>" + channelName);
+        }
+        mChannel = new MethodChannel(messenger, channelName);
         mChannel.setMethodCallHandler(this);
     }
 
@@ -68,7 +72,8 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
         }
         if (mAdView != null) {
             try {
-                mAdView.destroy();
+                if (mAdView instanceof UnifiedNativeAdView)
+                    ((UnifiedNativeAdView) mAdView).destroy();
             } catch (Exception e) {
             }
         }
@@ -96,9 +101,14 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
                                                 mViewId);
                                         return;
                                     }
+                                    if (!(mAdView instanceof UnifiedNativeAdView)) {
+                                        throw new RuntimeException(
+                                                "createUnifiedNativeAdView must return " +
+                                                        "UnifiedNativeAdView");
+                                    }
                                     mNativeAd = unifiedNativeAd;
-                                    populateAd(mNativeAd, mAdView);
-                                    mAdView.setNativeAd(mNativeAd);
+                                    populateAd(mNativeAd, (UnifiedNativeAdView) mAdView);
+                                    ((UnifiedNativeAdView) mAdView).setNativeAd(mNativeAd);
                                 }
                             }).withAdListener(new AdListener() {
                                 @Override
@@ -170,7 +180,7 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
                 map.putAll(parameters);
             }
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, event+", id: " + mViewId+", parameters: "+map);
+                Log.d(TAG, event + ", id: " + mViewId + ", parameters: " + map);
             }
             mChannel.invokeMethod(event, map);
             return true;
@@ -178,7 +188,7 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
         return false;
     }
 
-    public abstract UnifiedNativeAdView createUnifiedNativeAdView(Context context, BinaryMessenger
+    public abstract View createUnifiedNativeAdView(Context context, BinaryMessenger
             messenger, int id, String viewType);
 
     public abstract void populateAd(UnifiedNativeAd ad, UnifiedNativeAdView adView);

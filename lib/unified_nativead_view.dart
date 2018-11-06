@@ -119,7 +119,9 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
       _id = id;
       _created = true;
     });
-    _channel = MethodChannel('unified_nativead_plugin_${widget.viewType}_$id');
+    String channelName = 'unified_nativead_plugin_${widget.viewType}_$id';
+    debugPrint('channel =>$channelName');
+    _channel = MethodChannel(channelName);
     _channel.setMethodCallHandler(_handleMessages);
     _channel
         .invokeMethod("loadAd", <String, dynamic>{"adUnitId": widget.adUnitId});
@@ -133,7 +135,7 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
         debugPrint('hadle message $adEvent, view id: $_id');
       }
       if (UnifiedNativeAdView._methodToMobileAdEvent[adEvent] ==
-          MobileAdEvent.impression) {
+          MobileAdEvent.onAdLoaded) {
         _isAdShowing = true;
       } else if (UnifiedNativeAdView._methodToMobileAdEvent[adEvent] ==
           MobileAdEvent.failedToLoad) {
