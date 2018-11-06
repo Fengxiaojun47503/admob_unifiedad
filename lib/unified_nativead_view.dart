@@ -135,7 +135,7 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
         debugPrint('hadle message $adEvent, view id: $_id');
       }
       if (UnifiedNativeAdView._methodToMobileAdEvent[adEvent] ==
-          MobileAdEvent.onAdLoaded) {
+          MobileAdEvent.loaded) {
         _isAdShowing = true;
       } else if (UnifiedNativeAdView._methodToMobileAdEvent[adEvent] ==
           MobileAdEvent.failedToLoad) {
