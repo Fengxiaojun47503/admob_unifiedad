@@ -39,7 +39,7 @@ class UnifiedNativeAdView extends StatefulWidget {
     this.padding,
     this.placeHolder,
   });
-  final String adUnitId;
+  final dynamic adUnitId;
   final double width, height;
   final String viewType;
   final bool debugAd;
