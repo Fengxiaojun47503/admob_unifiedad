@@ -1,5 +1,7 @@
 package com.fxj.unifiednativeadplugin;
 
+import android.app.Activity;
+
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class UnifiedNativeadPlugin {
@@ -19,12 +21,12 @@ public class UnifiedNativeadPlugin {
 //                            .messenger()));
     }
 
-    public static void setUnifiedNativeAdImplement(String[] viewTypes,
-                                                   BaseUnifiedNativeAdViewFactory
-            implement) {
+    public static void setUnifiedNativeAdImplement(
+            Activity activity, String[] viewTypes, BaseUnifiedNativeAdViewFactory implement) {
         for (String viewType : viewTypes) {
             sRegistrar.platformViewRegistry().registerViewFactory(viewType,
-                    new UnifiedNativeAdFactory(viewType, sRegistrar.messenger(), implement));
+                    new UnifiedNativeAdFactory(activity, viewType, sRegistrar.messenger(),
+                            implement));
         }
     }
 

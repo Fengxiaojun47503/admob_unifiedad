@@ -1,5 +1,6 @@
 package com.fxj.unifiednativeadplugin;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,7 @@ import static com.fxj.unifiednativeadplugin.UnifiedNativeadPlugin.PLUGIN_PREFIX;
 public abstract class UnifiedNativeAdPlatformView implements PlatformView, MethodChannel
         .MethodCallHandler {
     private static final String TAG = UnifiedNativeAdPlatformView.class.getSimpleName();
+    protected Activity mActivity;
     protected Context mContext;
     protected String[] mTestDevices;
     protected MethodChannel mChannel;
@@ -32,8 +34,9 @@ public abstract class UnifiedNativeAdPlatformView implements PlatformView, Metho
     protected int mViewId;
     protected View mAdView;
 
-    public UnifiedNativeAdPlatformView(Context context, BinaryMessenger messenger, int
-            id, String viewType) {
+    public UnifiedNativeAdPlatformView(Activity activity, Context context, BinaryMessenger
+            messenger, int id, String viewType) {
+        mActivity = activity;
         mContext = context;
         mTestDevices = addTestDevices();
         mViewId = id;
