@@ -97,7 +97,7 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
                 onPlatformViewCreated: _onPlatformViewCreated,
               ),
               Offstage(
-                offstage: shouldShowNow || widget.placeHolder == null,
+                offstage: _isAdShowing || widget.placeHolder == null,
                 child: widget.placeHolder,
               ),
               Offstage(
