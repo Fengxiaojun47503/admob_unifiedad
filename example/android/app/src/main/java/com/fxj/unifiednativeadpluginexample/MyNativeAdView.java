@@ -1,5 +1,6 @@
 package com.fxj.unifiednativeadpluginexample;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +17,9 @@ import io.flutter.plugin.common.BinaryMessenger;
 public class MyNativeAdView extends UnifiedNativeAdPlatformView {
     private static final String TAG = MyNativeAdView.class.getSimpleName();
 
-    public MyNativeAdView(Context context, BinaryMessenger messenger, int
+    public MyNativeAdView(Activity activity, Context context, BinaryMessenger messenger, int
             id, String viewType) {
-        super(context, messenger, id, viewType);
+        super(activity, context, messenger, id, viewType);
     }
 
     @Override
@@ -30,8 +31,8 @@ public class MyNativeAdView extends UnifiedNativeAdPlatformView {
     @Override
     public UnifiedNativeAdView createUnifiedNativeAdView(Context context, BinaryMessenger
             messenger, int id, String viewType) {
-        return (UnifiedNativeAdView) LayoutInflater.from(context).inflate(R
-                .layout.my_ad_layout, null);
+        return (UnifiedNativeAdView) LayoutInflater.from(context).inflate(
+                R.layout.my_ad_layout, null);
     }
 
     @Override
@@ -39,25 +40,6 @@ public class MyNativeAdView extends UnifiedNativeAdPlatformView {
         TextView headlineView = adView.findViewById(R.id.ad_headline);
         headlineView.setText(ad.getHeadline());
         adView.setHeadlineView(headlineView);
-
         adView.setMediaView((MediaView) adView.findViewById(R.id.ad_media_view));
-
-        ImageView imageView = adView.findViewById(R.id.ad_image);
-        adView.setImageView(imageView);
-        boolean needShowImage = false;
-        int imageCount = ad.getImages().size();
-        android.util.Log.v(TAG, "view id: "+mViewId+" ,imageCount: " + imageCount);
-        if (imageCount > 0) {
-            android.util.Log.v(TAG, "view id: "+mViewId+" , image:"+ad.getImages().get(0).getUri()
-                    .toString());
-            imageView.setImageDrawable(ad.getImages().get(0).getDrawable());
-            if (ad.getVideoController().hasVideoContent()) {
-                android.util.Log.v(TAG, "view id: "+mViewId+"  has video");
-            } else {
-                android.util.Log.v(TAG, "view id: "+mViewId+"  has  no video");
-                needShowImage = true;
-            }
-        }
-        imageView.setVisibility(needShowImage ? View.VISIBLE : View.GONE);
     }
 }

@@ -1,5 +1,7 @@
 include ':app'
 
+rootProject.name = "AdmobUnifiedPlugin.Android"
+
 def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 
 def plugins = new Properties()
