@@ -112,6 +112,9 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
   }
 
   void _onPlatformViewCreated(int id) {
+    if (!mounted) {
+      return;
+    }
     if (_kIsDebug) {
       debugPrint('_onPlatformViewCreated id: $id');
     }
@@ -128,6 +131,9 @@ class _UnifiedNativeAdViewState extends State<UnifiedNativeAdView> {
   }
 
   Future<Null> _handleMessages(MethodCall call) async {
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _adEventOccur = true;
       adEvent = call.method;
