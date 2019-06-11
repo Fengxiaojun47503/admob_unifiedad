@@ -11,3 +11,7 @@ pubspec.lock
 .iml
 Podfile.lock
 unified_nativead_plugin.iml
+
+.classpath
+.project
+.settings
